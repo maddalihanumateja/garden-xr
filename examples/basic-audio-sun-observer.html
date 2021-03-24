@@ -1,0 +1,247 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>XR Garden - Sun</title>
+    <meta name="description" content="Remote Gardening Design Probe — Sun">
+
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+
+
+    <script>
+    // See also https://github.com/aframevr/aframe/pull/4356
+    var onKeydown = function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+                if(sun.object3D.rotation.z<=Math.PI*140/180 && evt.keyCode == 190){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                }
+
+                if(sun.object3D.rotation.z>Math.PI*70/180 && evt.keyCode == 188){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                }
+                //console.log(sun.object3D.rotation);
+            }
+    var onKeydown_Broadcast = function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+                if(sun.object3D.rotation.z<=Math.PI*140/180 && evt.keyCode == 190){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                    NAF.connection.broadcastData('rotate_add', {test:"success"});
+                }
+
+                if(sun.object3D.rotation.z>Math.PI*70/180 && evt.keyCode == 188){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                    NAF.connection.broadcastData('rotate_minus', {test:"success"});
+                }
+                //console.log(sun.object3D.rotation);
+            }
+    var addRotationZ_Broadcast = function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+                if(sun.object3D.rotation.z<=Math.PI*140/180){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                    NAF.connection.broadcastData('rotate_add', {test:"success"});
+                }
+            }
+    var minusRotationZ_Broadcast = function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+
+                if(sun.object3D.rotation.z>Math.PI*75/180){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                    NAF.connection.broadcastData('rotate_minus', {test:"success"});
+                }
+                //console.log(sun.object3D.rotation);
+            }
+    var addRotationZ = function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+                if(sun.object3D.rotation.z<=Math.PI*140/180){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                }
+            }
+    var minusRotationZ = function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+
+                if(sun.object3D.rotation.z>Math.PI*75/180){
+                    sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                }
+                //console.log(sun.object3D.rotation);
+            }
+
+          AFRAME.registerComponent('hide-in-ar-mode', {
+            // Set this object invisible while in AR mode.
+            init: function () {
+              this.el.sceneEl.addEventListener('enter-vr', (ev) => {
+                this.wasVisible = this.el.getAttribute('visible');
+                if (this.el.sceneEl.is('ar-mode')) {
+                  this.el.setAttribute('visible', false);
+                }
+              });
+              this.el.sceneEl.addEventListener('exit-vr', (ev) => {
+                if (this.wasVisible) this.el.setAttribute('visible', true);
+              });
+            }
+          });
+
+          AFRAME.registerComponent('keypress-rotate', {
+            // Set this object invisible while in AR mode.
+            init: function () {
+                this.el.object3D.rotation.z = Math.PI*70/180;
+                window.addEventListener('keydown', onKeydown_Broadcast);
+            }
+          });
+          AFRAME.registerComponent('handcontroller-rotate', {
+            // Set this object invisible while in AR mode.
+            init: function () {
+                this.el.object3D.rotation.z = Math.PI*70/180;
+                window.addEventListener('abuttondown', addRotationZ_Broadcast);
+                window.addEventListener('bbuttondown', minusRotationZ_Broadcast);
+
+            },
+            addRotationX: function(evt){
+                //console.log(evt.keyCode);
+                //188 is ", or <" aand 190 is ". or >"
+                var sun = document.getElementById("sun");
+                sun.object3D.rotation.x = sun.object3D.rotation.z + Math.PI/180;
+            }
+          });
+
+          NAF.connection.subscribeToDataChannel('rotate_add', addRotationZ);
+          NAF.connection.subscribeToDataChannel('rotate_minus', minusRotationZ);
+    </script>
+
+  </head>
+  <body>
+    <a-scene networked-scene="
+      app: gardenXR; 
+      room: gardenXRsun;
+      debug: true;
+      adapter: easyrtc;
+      audio: true;
+    " background="color:"#ff0">
+      <a-assets>
+
+        <img id="grid" src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" crossorigin="anonymous">
+
+        <!-- Templates -->
+
+        <!-- Avatar -->
+        <template id="avatar-template">
+          <a-entity class="avatar" networked-audio-source>
+            <a-sphere class="head"
+              color="#ffffff"
+              scale="0.45 0.5 0.4"
+            ></a-sphere>
+            <a-entity class="face"
+              position="0 0.05 0"
+            >
+              <a-sphere class="eye"
+                color="#efefef"
+                position="0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+              <a-sphere class="eye"
+                color="#efefef"
+                position="-0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+            </a-entity>
+          </a-entity>
+        </template>
+        <!-- Hand -->
+        <template id="hand-template">
+          <a-entity>
+          </a-entity>
+        </template>
+
+        <!-- /Templates -->
+
+        <a-mixin id="light"
+             geometry="primitive: sphere; radius: 1.0"
+             material="color: #FFF; shader: flat"
+             light="type: directional; castShadow: true; intensity: 2.5;"></a-mixin>
+        <a-asset-item id="garden" src="https://cdn.glitch.com/14c2e08d-fafc-493c-8971-fd328518c310%2Fgarden_glb.glb"></a-asset-item>
+
+      </a-assets>
+
+      <a-entity id="player"
+        camera
+        position="0 1.6 0"
+        spawn-in-circle="radius:3"
+        wasd-controls look-controls
+        >
+      </a-entity>
+
+      <!-- Sun-->
+        <a-entity id="sun" keypress-rotate handcontroller-rotate>
+        <a-entity mixin="light" position="20 0 0"></a-entity>
+        </a-entity>
+
+      <!--Ambient Lighting-->
+        <a-entity light="color: #ccccff; intensity: 0.5; type: ambient;" visible=""></a-entity>
+        <a-entity light="color: #ffaaff; intensity: 0.5" position="-10 -10 0"></a-entity>
+
+      <a-entity position="0 -3 0"
+        geometry="primitive: plane; width: 10000; height: 10000;" rotation="-90 0 0"
+        material="src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4;"></a-entity>
+      <a-entity gltf-model="#garden" position="0 0 0" rotation="-30 0 0" scale="0.5 0.5 0.5" shadow></a-entity>
+
+    </a-scene>
+
+
+    <script>
+      // On mobile remove elements that are resource heavy
+      var isMobile = AFRAME.utils.device.isMobile();
+      if (isMobile) {
+        //Add hands if oculus
+      }
+    </script>
+
+    <script>
+      // Define custom schema for syncing avatar color, set by random-color
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+          {
+            selector: '.head',
+            component: 'material',
+            property: 'color'
+          }
+        ]
+      });
+
+      // Called by Networked-Aframe when connected to server
+      function onConnect () {
+        console.log("onConnect", new Date());
+      }
+    </script>
+  </body>
+</html>

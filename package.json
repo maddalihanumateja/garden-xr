@@ -1,10 +1,10 @@
 {
   "name": "networked-aframe",
   "version": "0.8.0",
-  "description": "A web framework for building multi-user virtual reality experiences.",
+  "description": "Remote Gardening Design probes built using Hayden Lee's networked A-Frame module",
   "homepage": "",
   "main": "src/index.js",
-  "author": "Hayden Lee <haydenjameslee@gmail.com>",
+  "author": "Teja Maddali <hmaddali@umd.edu>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/networked-aframe/networked-aframe/issues"
