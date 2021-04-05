@@ -4,6 +4,45 @@
     <title>XR Garden - Sun</title>
     <meta name="description" content="Remote Gardening Design Probe — Sun">
 
+    <style>
+.slidecontainer {
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 23px;
+  height: 24px;
+  border: 0;
+  background: url('contrasticon.png');
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 23px;
+  height: 24px;
+  border: 0;
+  background: url('contrasticon.png');
+  cursor: pointer;
+}
+</style>
+
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
     <script src="/easyrtc/easyrtc.js"></script>
@@ -19,11 +58,11 @@
                 //console.log(evt.keyCode);
                 //188 is ", or <" aand 190 is ". or >"
                 var sun = document.getElementById("sun");
-                if(sun.object3D.rotation.z<=Math.PI*140/180 && evt.keyCode == 190){
+                if(sun.object3D.rotation.z<=Math.PI*160/180 && evt.keyCode == 190){
                     sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
                 }
 
-                if(sun.object3D.rotation.z>Math.PI*70/180 && evt.keyCode == 188){
+                if(sun.object3D.rotation.z>Math.PI*20/180 && evt.keyCode == 188){
                     sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
                 }
                 //console.log(sun.object3D.rotation);
@@ -32,34 +71,82 @@
                 //console.log(evt.keyCode);
                 //188 is ", or <" aand 190 is ". or >"
                 var sun = document.getElementById("sun");
-                if(sun.object3D.rotation.z<=Math.PI*140/180 && evt.keyCode == 190){
+                var slider_position = document.getElementById("sun-position");
+                if(sun.object3D.rotation.z<=Math.PI*160/180 && evt.keyCode == 190){
                     sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                    slider_position.value = sun.object3D.rotation.z *180/Math.PI;
                     NAF.connection.broadcastData('rotate_add', {test:"success"});
+                    easyrtc.sendServerMessage('customLogMessage', {'owner':easyrtc.myEasyrtcid,'event':'keypress', 'd':evt}, null, null);
                 }
 
-                if(sun.object3D.rotation.z>Math.PI*70/180 && evt.keyCode == 188){
+                if(sun.object3D.rotation.z>Math.PI*20/180 && evt.keyCode == 188){
                     sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                    slider_position.value = sun.object3D.rotation.z *180/Math.PI;
                     NAF.connection.broadcastData('rotate_minus', {test:"success"});
+                    easyrtc.sendServerMessage('customLogMessage', {'owner':easyrtc.myEasyrtcid,'event':'keypress', 'd':{'position':sun.object3D.position,'rotation':sun.object3D.rotation}}, null, null);
                 }
+                
                 //console.log(sun.object3D.rotation);
             }
+    var onSliderPosition_Broadcast = function(){
+                var sun = document.getElementById("sun");
+                    sun.object3D.rotation.z = this.value*Math.PI/180;
+                    NAF.connection.broadcastData('slider_position_change', {test:"success", value:this.value});
+                    easyrtc.sendServerMessage('customLogMessage', {'owner':easyrtc.myEasyrtcid,'event':'position_slider_changed', 'd':{'position':sun.object3D.position,'rotation':sun.object3D.rotation}}, null, null);
+                //console.log(sun.object3D.rotation);
+            }
+    var onSliderPosition = function(evt, data_type, data){
+      console.log(evt, data_type, data);
+                var sun = document.getElementById("sun");
+                var slider_position = document.getElementById("sun-position");
+                slider_position.value = data.value;
+                sun.object3D.rotation.z = data.value*Math.PI/180;
+                
+                //console.log(sun.object3D.rotation);
+            }
+    var onSliderDirection_Broadcast = function(){
+                var sun = document.getElementById("sun");
+                var eastWest = document.getElementById("east-west");
+                    sun.object3D.rotation.y = this.value*Math.PI/180;
+                    eastWest.object3D.rotation.y = this.value*Math.PI/180;
+                    NAF.connection.broadcastData('slider_direction_change', {test:"success", value:this.value});
+                    easyrtc.sendServerMessage('customLogMessage', {'owner':easyrtc.myEasyrtcid,'event':'direction_slider_changed', 'd':{'position':sun.object3D.position,'rotation':sun.object3D.rotation}}, null, null);
+                //console.log(sun.object3D.rotation);
+            }
+    var onSliderDirection = function(evt, data_type, data){
+      console.log(evt, data_type, data);
+                var sun = document.getElementById("sun");
+                var eastWest = document.getElementById("east-west");
+                var slider_position = document.getElementById("sun-direction");
+                slider_position.value = data.value;
+                sun.object3D.rotation.y = data.value*Math.PI/180;
+                eastWest.object3D.rotation.y = data.value*Math.PI/180;
+                
+                //console.log(sun.object3D.rotation);
+            }
+
     var addRotationZ_Broadcast = function(evt){
                 //console.log(evt.keyCode);
                 //188 is ", or <" aand 190 is ". or >"
                 var sun = document.getElementById("sun");
-                if(sun.object3D.rotation.z<=Math.PI*140/180){
+                var slider_position = document.getElementById("sun-position");
+                if(sun.object3D.rotation.z<=Math.PI*160/180){
                     sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                    slider_position.value = sun.object3D.rotation.z *180/Math.PI;
                     NAF.connection.broadcastData('rotate_add', {test:"success"});
+                    easyrtc.sendServerMessage('customLogMessage', {'owner':easyrtc.myEasyrtcid,'event':'rotate_add','d':{'position':sun.object3D.position,'rotation':sun.object3D.rotation}}, null, null);
                 }
             }
     var minusRotationZ_Broadcast = function(evt){
                 //console.log(evt.keyCode);
                 //188 is ", or <" aand 190 is ". or >"
                 var sun = document.getElementById("sun");
-
-                if(sun.object3D.rotation.z>Math.PI*75/180){
+                var slider_position = document.getElementById("sun-position");
+                if(sun.object3D.rotation.z>Math.PI*25/180){
                     sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                    slider_position.value = sun.object3D.rotation.z *180/Math.PI;
                     NAF.connection.broadcastData('rotate_minus', {test:"success"});
+                    easyrtc.sendServerMessage('customLogMessage', {'owner':easyrtc.myEasyrtcid,'event':'rotate_minus','d':{'position':sun.object3D.position,'rotation':sun.object3D.rotation}}, null, null);
                 }
                 //console.log(sun.object3D.rotation);
             }
@@ -67,17 +154,20 @@
                 //console.log(evt.keyCode);
                 //188 is ", or <" aand 190 is ". or >"
                 var sun = document.getElementById("sun");
-                if(sun.object3D.rotation.z<=Math.PI*140/180){
+                var slider_position = document.getElementById("sun-position");
+                if(sun.object3D.rotation.z<=Math.PI*160/180){
                     sun.object3D.rotation.z = sun.object3D.rotation.z + Math.PI/180;
+                    slider_position.value = sun.object3D.rotation.z *180/Math.PI;
                 }
             }
     var minusRotationZ = function(evt){
                 //console.log(evt.keyCode);
                 //188 is ", or <" aand 190 is ". or >"
                 var sun = document.getElementById("sun");
-
-                if(sun.object3D.rotation.z>Math.PI*75/180){
+                var slider_position = document.getElementById("sun-position");
+                if(sun.object3D.rotation.z>Math.PI*25/180){
                     sun.object3D.rotation.z = sun.object3D.rotation.z-Math.PI/180;
+                    slider_position.value = sun.object3D.rotation.z *180/Math.PI;
                 }
                 //console.log(sun.object3D.rotation);
             }
@@ -100,14 +190,14 @@
           AFRAME.registerComponent('keypress-rotate', {
             // Set this object invisible while in AR mode.
             init: function () {
-                this.el.object3D.rotation.z = Math.PI*70/180;
+                this.el.object3D.rotation.z = Math.PI*20/180;
                 window.addEventListener('keydown', onKeydown_Broadcast);
             }
           });
           AFRAME.registerComponent('handcontroller-rotate', {
             // Set this object invisible while in AR mode.
             init: function () {
-                this.el.object3D.rotation.z = Math.PI*70/180;
+                this.el.object3D.rotation.z = Math.PI*20/180;
                 window.addEventListener('abuttondown', addRotationZ_Broadcast);
                 window.addEventListener('bbuttondown', minusRotationZ_Broadcast);
 
@@ -122,17 +212,25 @@
 
           NAF.connection.subscribeToDataChannel('rotate_add', addRotationZ);
           NAF.connection.subscribeToDataChannel('rotate_minus', minusRotationZ);
+          NAF.connection.subscribeToDataChannel('slider_position_change', onSliderPosition);
+          NAF.connection.subscribeToDataChannel('slider_direction_change', onSliderDirection);
     </script>
 
   </head>
   <body>
+
+<div style="position:relative;">
+    
+
     <a-scene networked-scene="
       app: gardenXR; 
       room: gardenXRsun;
       debug: true;
       adapter: easyrtc;
-      audio: true;
-    " background="color:"#ff0">
+      audio: false;
+    " background="color:"#ff0"
+    webxr="requiredFeatures: hit-test,local-floor;
+      optionalFeatures: dom-overlay,unbounded;">
       <a-assets>
 
         <img id="grid" src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" crossorigin="anonymous">
@@ -201,12 +299,15 @@
           visible="false"
           random-color
         ></a-sphere>
+        <a-entity id="hand-left" hand-controls="left" networked="template:#hand-template;"></a-entity>
+        <a-entity id="hand-right" hand-controls="right" networked="template:#hand-template;"></a-entity>
       </a-entity>
 
       <!-- Sun-->
         <a-entity id="sun" keypress-rotate handcontroller-rotate>
         <a-entity mixin="light" position="20 0 0"></a-entity>
         </a-entity>
+        <a-entity id="east-west" geometry="primitive: torus; radius: 20; radiusTubular: 0.01; arc: 180" material="side: double"></a-entity>
 
       <!--Ambient Lighting-->
         <a-entity light="color: #ccccff; intensity: 0.5; type: ambient;" visible=""></a-entity>
@@ -218,14 +319,33 @@
       <a-entity gltf-model="#garden" position="0 0 0" rotation="-30 0 0" scale="0.5 0.5 0.5" shadow></a-entity>
 
     </a-scene>
-
+<div id="slidercontainer" class="slidecontainer" style="position:absolute; bottom:0; left:10%; z-index:1000; background-color:white ">
+  <spap>Time of day</span>
+  <input type="range" min="20" max="160" value="20" id="sun-position">
+  <span>Sun Movement Direction</span>
+  <input type="range" min="0" max="360" value="0" id="sun-direction">
+    </div>
+</div>
 
     <script>
       // On mobile remove elements that are resource heavy
+      
+      var isOculus = AFRAME.utils.device.isOculusGo();
       var isMobile = AFRAME.utils.device.isMobile();
       if (isMobile) {
         //Add hands if oculus
       }
+      if(!isOculus){
+        var myobj = document.getElementById("hand-left");
+        myobj.remove();
+        var myobj = document.getElementById("hand-right");
+        myobj.remove();
+      }
+      else{
+        //var myobj = document.getElementById("slidercontainer");
+        //myobj.remove();
+      }
+
     </script>
 
     <script>
@@ -249,4 +369,12 @@
       }
     </script>
   </body>
+
+  <script>
+var slider_position = document.getElementById("sun-position");
+var slider_direction = document.getElementById("sun-direction");
+
+slider_position.oninput = onSliderPosition_Broadcast;
+slider_direction.oninput = onSliderDirection_Broadcast;
+</script>
 </html>

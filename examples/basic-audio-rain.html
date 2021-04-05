@@ -183,10 +183,12 @@
       room: gardenXRrain;
       debug: true;
       adapter: easyrtc;
-      audio: true;
+      audio: false;
     " physics="
       restitution:0.15; 
-      iterations:6;">
+      iterations:6;"
+      webxr="requiredFeatures: hit-test,local-floor;
+      optionalFeatures: dom-overlay,unbounded;">
       <a-assets>
         <!--Garden 3D model-->
         <a-asset-item id="garden" src="assets/garden_939faces.glb"></a-asset-item>
@@ -251,6 +253,8 @@
           visible="false"
           random-color
         ></a-sphere>
+        <a-entity id="hand-left" hand-controls="left" networked="template:#hand-template;"></a-entity>
+        <a-entity id="hand-right" hand-controls="right" networked="template:#hand-template;"></a-entity>
       </a-entity>
 
       <a-entity light="color: #ccccff; intensity: 1; type: ambient;" visible=""></a-entity>
@@ -269,9 +273,17 @@
 
     <script>
       // On mobile remove elements that are resource heavy
+      
+      var isOculus = AFRAME.utils.device.isOculusGo();
       var isMobile = AFRAME.utils.device.isMobile();
       if (isMobile) {
         //Add hands if oculus
+      }
+      if(!isOculus){
+        var myobj = document.getElementById("hand-left");
+        myobj.remove();
+        var myobj = document.getElementById("hand-right");
+        myobj.remove();
       }
     </script>
 

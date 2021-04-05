@@ -3,6 +3,9 @@
 const fs = require('fs')
 const key = fs.readFileSync('./server/key.pem');
 const cert = fs.readFileSync('./server/cert.pem');
+const logFolderPath = './logs/';
+var currentRoomLogs = {};
+var currentUserRoom = {};
 
 const https = require('https');
 const http = require("http");                 // http server core module
@@ -16,7 +19,6 @@ process.title = "networked-aframe-server";
 
 // Get port or default to 8080
 const port = process.env.PORT || 8080;
-
 // Setup and configure Express http server.
 const app = express();
 app.use(express.static(path.resolve(__dirname, "..", "examples")));
@@ -37,7 +39,7 @@ if (process.env.NODE_ENV === "development") {
 // Start Express http server
 //const webServer = http.createServer(app);
 // Start Express https server
-const webServer = https.createServer({key: key, cert: cert }, app);
+const webServer = https.createServer({key: key, cert: cert}, app);
 
 // Start Socket.io so it attaches itself to Express server
 const socketServer = socketIo.listen(webServer, {"log level": 1});
@@ -57,6 +59,7 @@ const myIceServers = [
 ];
 easyrtc.setOption("appIceServers", myIceServers);
 easyrtc.setOption("logLevel", "debug");
+//easyrtc.setOption("logMessagesEnable", true);
 easyrtc.setOption("demosEnable", false);
 
 // Overriding the default easyrtcAuth listener, only so we can directly access its callback
@@ -79,6 +82,15 @@ easyrtc.events.on("easyrtcAuth", (socket, easyrtcid, msg, socketCallback, callba
 easyrtc.events.on("roomJoin", (connectionObj, roomName, roomParameter, callback) => {
     console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
     easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
+    connectionObj.room(roomName,(err,connectionRoomObj) => {
+      if(connectionRoomObj.getRoom().getConnectionCountSync() == 1){
+        //Open a new file with filename as roomName+currenttimestamp if the user who joined the room is the only user in the room
+        //Start logging all user position data from this room into this file
+        currentRoomLogs[roomName] = roomName+Date.now()+'.txt';
+      }
+      //Save which room the user is in. Couldn't find a single function that would get the single current room for a user.
+      currentUserRoom[connectionObj.getEasyrtcid()] = roomName;
+    });
 });
 
 // Start EasyRTC server
@@ -91,6 +103,27 @@ easyrtc.listen(app, socketServer, null, (err, rtcRef) => {
         appObj.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
     });
 });
+
+// Modify onEmitEasyrtcMsg to print message data or store it in a database during the session!
+easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
+  if(msg.msgType == 'customLogMessage'){
+    msg.msgData['serverTime']=Date.now();
+    var roomName = currentUserRoom[connectionObj.getEasyrtcid()];
+    //console.log("["+connectionObj.getEasyrtcid()+"] :", JSON.stringify(msg.msgData));
+    fs.appendFile(logFolderPath+currentRoomLogs[roomName],JSON.stringify(msg.msgData)+'\n', (err) => {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        //console.log("Wrote to "+ logFolderPath+currentRoomLogs[roomName]);
+      }
+    });
+  }
+  else{
+    easyrtc.events.defaultListeners.easyrtcMsg(connectionObj, msg, socketCallback, next);
+  }
+});
+
 
 // Listen on port
 webServer.listen(port, () => {

@@ -197,6 +197,8 @@ class NetworkConnection {
   receivedData(fromClientId, dataType, data, source) {
     if (this.dataChannelSubs[dataType]) {
       this.dataChannelSubs[dataType](fromClientId, dataType, data, source);
+      //Print data to browser console on client side
+      //NAF.log.write(JSON.stringify(data));
     } else {
       NAF.log.write('NetworkConnection@receivedData: ' + dataType + ' has not been subscribed to yet. Call subscribeToDataChannel()');
     }

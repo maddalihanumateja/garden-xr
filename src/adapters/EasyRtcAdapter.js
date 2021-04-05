@@ -134,10 +134,12 @@ class EasyRtcAdapter extends NoOpAdapter {
   sendData(clientId, dataType, data) {
     // send via webrtc otherwise fallback to websockets
     this.easyrtc.sendData(clientId, dataType, data);
+    easyrtc.sendServerMessage('customLogMessage', data, null, null);
   }
 
   sendDataGuaranteed(clientId, dataType, data) {
     this.easyrtc.sendDataWS(clientId, dataType, data);
+    easyrtc.sendServerMessage('customLogMessage', data, null, null);
   }
 
   broadcastData(dataType, data) {
@@ -154,11 +156,13 @@ class EasyRtcAdapter extends NoOpAdapter {
         this.easyrtc.sendData(roomOccupant, dataType, data);
       }
     }
+    easyrtc.sendServerMessage('customLogMessage', data, null, null);
   }
 
   broadcastDataGuaranteed(dataType, data) {
     var destination = { targetRoom: this.room };
     this.easyrtc.sendDataWS(destination, dataType, data);
+    easyrtc.sendServerMessage('customLogMessage', data, null, null);
   }
 
   getConnectStatus(clientId) {
