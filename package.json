@@ -1,14 +1,11 @@
 {
-  "name": "networked-aframe",
+  "name": "garden-xr",
   "version": "0.8.0",
   "description": "Remote Gardening Design probes built using Hayden Lee's networked A-Frame module",
   "homepage": "",
   "main": "src/index.js",
   "author": "Teja Maddali <hmaddali@umd.edu>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/networked-aframe/networked-aframe/issues"
-  },
   "scripts": {
     "build": "npm run dist && shx cp -r dist examples",
     "dev": "cross-env NODE_ENV=development node ./server/easyrtc-server.js",
@@ -30,6 +27,7 @@
   "dependencies": {
     "buffered-interpolation": "^0.2.5",
     "express": "^4.17.1",
+    "ftp": "^0.3.10",
     "open-easyrtc": "^2.0.5",
     "socket.io": "^2.3.0"
   },
