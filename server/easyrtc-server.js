@@ -1,7 +1,7 @@
 // Load required modules
 //From https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/
 const fs = require('fs');
-var Client = require('ftp');
+//var Client = require('ftp');
 const key = fs.readFileSync('./server/key.pem');
 const cert = fs.readFileSync('./server/cert.pem');
 const logFolderPath = './logs/';
@@ -25,11 +25,7 @@ const app = express();
 app.use(express.static(path.resolve(__dirname, "..", "examples")));
 
 //Prepare FTP client for storing user logs on FTP server
-var c = new Client();
-//c.connect({host: '73.132.239.210', port: 21, user: 'FTP-garden-logs', password: 'password'});
-
-//Testing with local network ftp server
-c.connect({host: '192.168.0.16', port: 21, user: 'FTP-garden-logs', password: 'password'});
+//var c = new Client();
 
 // Serve the example and build the bundle in development.
 if (process.env.NODE_ENV === "development") {
@@ -118,23 +114,16 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
     msg.msgData['serverTime']=Date.now();
     var roomName = currentUserRoom[connectionObj.getEasyrtcid()];
 
-    //Write logs to remote FTP server file
-    c.on('ready', function() {
-        c.put(JSON.stringify(msg.msgData)+'\n', currentRoomLogs[roomName], function(err) {
-          if (err) throw err;
-          c.end();
-        });
-    });
     //Write logs to local file
     //console.log("["+connectionObj.getEasyrtcid()+"] :", JSON.stringify(msg.msgData));
-    /*fs.appendFile(logFolderPath+currentRoomLogs[roomName],JSON.stringify(msg.msgData)+'\n', (err) => {
+    fs.appendFile(logFolderPath+currentRoomLogs[roomName],JSON.stringify(msg.msgData)+'\n', (err) => {
       if (err) {
         console.log(err);
       }
       else {
         //console.log("Wrote to "+ logFolderPath+currentRoomLogs[roomName]);
       }
-    });*/
+    });
   }
   else{
     easyrtc.events.defaultListeners.easyrtcMsg(connectionObj, msg, socketCallback, next);
@@ -146,3 +135,17 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
 webServer.listen(port, () => {
     console.log("listening on http://localhost:" + port);
 });
+
+
+
+//Testing with local network ftp server
+/*    c.on('ready', function() {
+        console.log('ready');
+        c.put('.\\logs\\gardenXRsun1617722082233.txt', 'gardenXRsun1617722082233.txt', function(err) {
+          if (err) console.log(err);
+          c.end();
+        });
+    });
+c.connect({host: '192.168.0.16', port: 21, user: 'FTP-garden-logs', password: 'password'});*/
+//c.connect({host: '73.132.239.210', port: 21, user: 'FTP-garden-logs', password: 'password'});
+

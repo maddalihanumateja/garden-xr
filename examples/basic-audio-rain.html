@@ -2,20 +2,18 @@
   <head>
     <meta charset="utf-8">
     <title>XR Garden - Rain</title>
-    <meta name="description" content="Remote Gardening Design Probe — Rain">
-
+    <meta name="description" content="Remote Gardening Design Probe — Sun">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
     <script src="/easyrtc/easyrtc.js"></script>
     <script src="/dist/networked-aframe.js"></script>
 
     <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
-    <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
-    <script src="https://raw.githubusercontent.com/schteppe/cannon.js/master/build/cannon.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
     <script src="/js/spawn-in-circle.component.js"></script>
 
-
-    <script>
+     <script>
     // See also https://github.com/aframevr/aframe/pull/4356
           AFRAME.registerComponent('hide-in-ar-mode', {
             // Set this object invisible while in AR mode.
@@ -33,19 +31,45 @@
           });
     </script>
     <script>
+      AFRAME.registerComponent("ground-properties", {
+        schema:{},
+        init: function(){      
+          this.el.addEventListener("body-loaded", function(e) {
+            var ground = document.getElementById('ground');
+            ground.body.setRestitution(0);
+
+          });
+          this.el.addEventListener("model-loaded", function(e){
+            console.log("model-loaded");
+            setTimeout(function(){
+              var ground = document.getElementById('ground');
+              ground.setAttribute("ammo-body", {type: "static", mass: 100 });
+              ground.setAttribute("ammo-shape", {type: "mesh" });
+
+              var rain_seed =document.getElementById('ground');
+              rain_seed.setAttribute("particles", "");
+            },100);
+            
+          });
+          //ammo-body="type: static; mass: 100;" ammo-shape="type: box ;"
+        }
+      });
+
       AFRAME.registerComponent('apply-wind', {
-        schema:{
-          x: {type: 'number', default: 0.0}, 
-          y: {type: 'number', default: 0.0}, 
-          z: {type: 'number', default: 0.0},
-          std: {type: 'number', default: 0.05} 
-        },
-        init:function(){
-          this.el.body.applyForce(
-            /* impulse */        new CANNON.Vec3(this.data.x*(1-Math.random()*this.data.std), this.data.y*(1-Math.random()*this.data.std), this.data.z*(1-Math.random()*this.data.std)),
-            /* world position */ new CANNON.Vec3().copy(this.el.object3D.position)
-          );
-        },
+        schema: {
+            x: { type: "number", default: 0.01 },
+            y: { type: "number", default: 0.0 },
+            z: { type: "number", default: 0.01 },
+            std: { type: "number", default: 0.05 }
+          },
+          init: function() {
+            this.el.body.setRestitution(0);
+            const force = new Ammo.btVector3(this.data.x * (1 - Math.random() * this.data.std), this.data.y * (1 - Math.random() * this.data.std), this.data.z * (1 - Math.random() * this.data.std));
+            const pos = new Ammo.btVector3(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
+            this.el.body.applyForce(force, pos);
+            Ammo.destroy(force);
+            Ammo.destroy(pos);
+          },
         tick:function(){
           if(this.el.object3D.position.y<this.data.ground_level){
             var visible_line_trail = document.getElementById("visible_line_trail"+this.el.id);
@@ -63,7 +87,7 @@
       AFRAME.registerComponent('position-trail', {
         schema: {
           position_buffer: {type:'array', default:[]},
-          trail_length: {type: 'int', default: 2},
+          trail_length: {type: 'int', default: 3},
           trail_width: {type: 'number', default: 0.05},
           trail_opacity: {type: 'number', default: 0.95},
           trail_color: {default: "#9CE3F9"}
@@ -122,16 +146,16 @@
 
       AFRAME.registerComponent('particles',{
         schema:{
-          particle_count: {type: 'int', default: 25},
+          particle_count: {type: 'int', default: 50},
           particle_opacity:{type: 'number', default: 0.65}, 
           particle_metalness:{type: 'number', default: 0.0},
           particle_roughness:{type: 'number', default: 1.0},
           particle_radius: {type: 'number', default: 0.02},
           particle_color: {default: "#9CE3F9"},
-          particle_mass: {type: 'number', default: 0.001},
+          particle_mass: {type: 'number', default: 1},
           emission_interval: {type: 'int', default: 300},
           deletion_interval: {type: 'int', default: 3000},
-          emission_radius: {type: 'int', default: 5.5}
+          emission_radius: {type: 'int', default: 9}
         },
         init:function(){
           this.tick = AFRAME.utils.throttleTick(this.tick, this.data.emission_interval, this);
@@ -146,9 +170,10 @@
             opacity: this.data.particle_opacity,
             metalness: this.data.particle_metalness,
             roughness: this.data.particle_roughness
-          })
-          particle.setAttribute('dynamic-body',{"mass":this.data.particle_mass});
-          //particle.setAttribute('apply-wind',"");
+          });
+          particle.setAttribute("ammo-body", {mass: this.data.particle_mass });
+          particle.setAttribute("ammo-shape", {type: "sphere" });
+          particle.setAttribute('apply-wind',"");
           particle.setAttribute('remove-below-ground',"");
           particle.setAttribute('id', "_particle"+Date.now());
           document.getElementsByTagName("a-scene")[0].appendChild(particle);
@@ -178,23 +203,18 @@
 
   </head>
   <body>
+    
+
     <a-scene networked-scene="
       app: gardenXR; 
-      room: gardenXRrain;
+      room: gardenXRsun;
       debug: true;
       adapter: easyrtc;
       audio: false;
-    " physics="
-      restitution:0.15; 
-      iterations:6;"
-      background="color:#99ccff"
-      webxr="requiredFeatures: hit-test,local-floor;
-      optionalFeatures: dom-overlay,unbounded;">
+    " background="color:#878d8b"
+    webxr="requiredFeatures: hit-test,local-floor;
+      optionalFeatures: dom-overlay,unbounded;" physics=" driver: ammo; iterations:6; debug:false">
       <a-assets>
-        <!--Garden 3D model-->
-        <a-asset-item id="garden" src="assets/garden_939faces.glb"></a-asset-item>
-
-        <img id="grid" src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png" crossorigin="anonymous">
 
         <!-- Templates -->
 
@@ -233,7 +253,6 @@
             </a-entity>
           </a-entity>
         </template>
-
         <!-- Hand -->
         <template id="hand-template">
           <a-entity>
@@ -241,6 +260,8 @@
         </template>
 
         <!-- /Templates -->
+        <a-asset-item id="garden" src="assets/garden_939faces_extruded.gltf"></a-asset-item>
+
       </a-assets>
 
       <a-entity id="player"
@@ -257,20 +278,16 @@
         <a-entity id="hand-left" hand-controls="left" networked="template:#hand-template;"></a-entity>
         <a-entity id="hand-right" hand-controls="right" networked="template:#hand-template;"></a-entity>
       </a-entity>
+        
+      <!--Ambient Lighting-->
+        <a-entity light="color: #ccccff; intensity: 1; type: ambient;" visible=""></a-entity>
+        <a-entity light="color: #ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
 
-      <a-entity light="color: #ccccff; intensity: 1; type: ambient;" visible=""></a-entity>
-      <a-entity light="color: #ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
+      
+      <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -5 0" src="#garden" ground-properties></a-gltf-model>
+      <a-sphere position="0 5 0" color="#878d8b" radius="0.04" id="rain-seed"></a-sphere>
 
-      <a-entity position="0 -3 0"
-        geometry="primitive: plane; width: 10000; height: 10000;" rotation="-90 0 0"
-        material="src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4;"></a-entity>
-
-      <a-entity position="0 0 0">
-        <a-sphere position="0 -1 0"color="white" radius="0.04" particles></a-sphere>
-        <a-entity static-body="shape:hull" gltf-model="#garden" position="0 0 0" rotation="-30 0 0" scale="0.5 0.5 0.5"></a-entity>  
-      </a-entity>
     </a-scene>
-
 
     <script>
       // On mobile remove elements that are resource heavy
@@ -286,6 +303,12 @@
         var myobj = document.getElementById("hand-right");
         myobj.remove();
       }
+      else{
+        //var myobj = document.getElementById("slidercontainer");
+        //myobj.remove();
+      }
+
+
     </script>
 
     <script>
