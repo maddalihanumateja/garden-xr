@@ -20,7 +20,7 @@ const assert = require('assert');
 // Connection URL
 const url = 'mongodb://73.132.239.210';
 // Database Name
-const dbName = 'xr-garden-study';
+const dbName = 'xrGardenStudy';
 const client = new MongoClient(url);
 
 // Set process name
@@ -138,7 +138,7 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
       assert.equal(null, err);
       //console.log('Connected successfully to server');
       const db = client.db(dbName);
-      insertObj(db, 'naf-logs', msg.msgData, function(){});
+      insertObj(db, 'nafLogs', msg.msgData, function(){});
     });
 
   }
