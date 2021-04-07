@@ -2,7 +2,7 @@
   <head>
     <meta charset="utf-8">
     <title>XR Garden - Rain</title>
-    <meta name="description" content="Remote Gardening Design Probe — Sun">
+    <meta name="description" content="Remote Gardening Design Probe — Rain">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
     <script src="/easyrtc/easyrtc.js"></script>
@@ -146,7 +146,7 @@
 
       AFRAME.registerComponent('particles',{
         schema:{
-          particle_count: {type: 'int', default: 50},
+          particle_count: {type: 'int', default: 25},
           particle_opacity:{type: 'number', default: 0.65}, 
           particle_metalness:{type: 'number', default: 0.0},
           particle_roughness:{type: 'number', default: 1.0},
@@ -155,7 +155,7 @@
           particle_mass: {type: 'number', default: 1},
           emission_interval: {type: 'int', default: 300},
           deletion_interval: {type: 'int', default: 3000},
-          emission_radius: {type: 'int', default: 9}
+          emission_radius: {type: 'int', default: 7}
         },
         init:function(){
           this.tick = AFRAME.utils.throttleTick(this.tick, this.data.emission_interval, this);
@@ -285,7 +285,7 @@
 
       
       <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -5 0" src="#garden" ground-properties></a-gltf-model>
-      <a-sphere position="0 5 0" color="#878d8b" radius="0.04" id="rain-seed"></a-sphere>
+      <a-sphere position="0 6 0" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
 
     </a-scene>
 

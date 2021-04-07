@@ -25,9 +25,10 @@
   },
   "repository": "networked-aframe/networked-aframe",
   "dependencies": {
+    "assert": "^1.5.0",
     "buffered-interpolation": "^0.2.5",
     "express": "^4.17.1",
-    "ftp": "^0.3.10",
+    "mongodb": "^3.6.6",
     "open-easyrtc": "^2.0.5",
     "socket.io": "^2.3.0"
   },

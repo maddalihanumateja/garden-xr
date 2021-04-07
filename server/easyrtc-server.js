@@ -1,7 +1,6 @@
 // Load required modules
 //From https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/
 const fs = require('fs');
-//var Client = require('ftp');
 const key = fs.readFileSync('./server/key.pem');
 const cert = fs.readFileSync('./server/cert.pem');
 const logFolderPath = './logs/';
@@ -15,6 +14,15 @@ const express = require("express");           // web framework external module
 const socketIo = require("socket.io");        // web socket external module
 const easyrtc = require("open-easyrtc");      // EasyRTC external module
 
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+// Connection URL
+const url = 'mongodb://73.132.239.210';
+// Database Name
+const dbName = 'xr-garden-study';
+const client = new MongoClient(url);
+
 // Set process name
 process.title = "networked-aframe-server";
 
@@ -24,8 +32,6 @@ const port = process.env.PORT || 8080;
 const app = express();
 app.use(express.static(path.resolve(__dirname, "..", "examples")));
 
-//Prepare FTP client for storing user logs on FTP server
-//var c = new Client();
 
 // Serve the example and build the bundle in development.
 if (process.env.NODE_ENV === "development") {
@@ -124,6 +130,17 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
         //console.log("Wrote to "+ logFolderPath+currentRoomLogs[roomName]);
       }
     });
+
+    msg.msgData['roomName']=roomName;
+
+    // Use connect method to connect to the server
+    client.connect(function(err) {
+      assert.equal(null, err);
+      //console.log('Connected successfully to server');
+      const db = client.db(dbName);
+      insertObj(db, 'naf-logs', msg.msgData, function(){});
+    });
+
   }
   else{
     easyrtc.events.defaultListeners.easyrtcMsg(connectionObj, msg, socketCallback, next);
@@ -136,16 +153,13 @@ webServer.listen(port, () => {
     console.log("listening on http://localhost:" + port);
 });
 
-
-
-//Testing with local network ftp server
-/*    c.on('ready', function() {
-        console.log('ready');
-        c.put('.\\logs\\gardenXRsun1617722082233.txt', 'gardenXRsun1617722082233.txt', function(err) {
-          if (err) console.log(err);
-          c.end();
-        });
-    });
-c.connect({host: '192.168.0.16', port: 21, user: 'FTP-garden-logs', password: 'password'});*/
-//c.connect({host: '73.132.239.210', port: 21, user: 'FTP-garden-logs', password: 'password'});
+const insertObj = function(db, collection_name, obj, callback) {
+  // Get the documents collection
+  const collection = db.collection(collection_name);
+  // Insert some documents
+  collection.insertOne(obj, function(err, result) {
+    assert.equal(err, null);
+    callback(result);
+  });
+};
 
