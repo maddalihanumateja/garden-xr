@@ -1,1 +1,1 @@
-web: node ./server/easyrtc-server.js"
+web: node ./server/easyrtc-server.js
