@@ -49,9 +49,9 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 
-// Start Express http server for heroku
+// Start Express http server
 const webServer = http.createServer(app);
-// Start Express https server for local testing
+// Start Express https server
 //const webServer = https.createServer({key: key, cert: cert}, app);
 
 // Start Socket.io so it attaches itself to Express server
