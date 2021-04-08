@@ -134,6 +134,9 @@ class NetworkConnection {
 
     var evt = new CustomEvent('clientConnected', {detail: {clientId: clientId}});
     document.body.dispatchEvent(evt);
+
+    const event = new CustomEvent('connected_entities_changed');
+    document.dispatchEvent(event);
   }
 
   dataChannelClosed(clientId) {
@@ -143,6 +146,9 @@ class NetworkConnection {
 
     var evt = new CustomEvent('clientDisconnected', {detail: {clientId: clientId}});
     document.body.dispatchEvent(evt);
+
+    const event = new CustomEvent('connected_entities_changed');
+    document.dispatchEvent(event);
   }
 
   hasActiveDataChannel(clientId) {

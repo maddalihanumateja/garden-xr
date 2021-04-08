@@ -215,17 +215,6 @@
           NAF.connection.subscribeToDataChannel('slider_position_change', onSliderPosition);
           NAF.connection.subscribeToDataChannel('slider_direction_change', onSliderDirection);
     </script>
-    <script type="text/javascript">
-      function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-      }
-      function alternate_viewpoint(){
-        var cam = document.getElementById("player");
-        cam.object3D.position.set(getRandomInt(-4,4),10,getRandomInt(-4,4));
-      }
-    </script>
 
   </head>
   <body>
@@ -297,11 +286,8 @@
 
       </a-assets>
 
-      <a-entity id="player"
+      <a-entity id="player" name="camera"
         camera
-        position="0 10 0"
-        rotation="-90 0 0"
-        look-controls
         >
         <a-sphere class="head"
           visible="false"
@@ -377,6 +363,49 @@
       }
     </script>
   </body>
+
+  <script type="text/javascript">
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+      }
+      function alternate_viewpoint(){
+        var cam = document.getElementById("player");
+        cam.object3D.position.set(getRandomInt(-4,4),10,getRandomInt(-4,4));
+      }
+
+
+      
+      document.addEventListener('connected_entities_changed', function(e){
+        var viewcontainer = document.getElementById("viewcontainer");
+        viewcontainer.innerHTML = '';
+        for (var i=0; i<Object.keys(NAF.connection.entities.entities).length;i++){
+          var btn = document.createElement("BUTTON");   // Create a <button> element
+          btn.innerHTML = Object.keys(NAF.connection.entities.entities)[i];                   // Insert text
+          //console.log(NAF.connection.entities.entities[btn.innerHTML]);
+          btn.addEventListener('click', function(){
+            var cam = document.getElementsByName("camera")[0];
+            var remoteEntity = NAF.connection.entities.entities[btn.innerHTML];
+            remoteEntity.setAttribute('visible', false);
+            if(cam.getAttribute("id")=="player"){
+            }
+            else{
+              cam.setAttribute('visible', true);
+            }
+
+            cam.removeAttribute("camera");
+            remoteEntity.setAttribute("camera","");
+            remoteEntity.setAttribute("name","camera");
+            //cam.object3D.position.set(remoteEntity.object3D.position.x,remoteEntity.object3D.position.y,remoteEntity.object3D.position.z);
+
+          });
+          viewcontainer.appendChild(btn);               // Append <button> to <body>
+
+        }
+
+      });
+    </script>
 
   <script>
 var slider_position = document.getElementById("sun-position");

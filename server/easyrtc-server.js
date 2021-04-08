@@ -133,6 +133,7 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
 
     msg.msgData['roomName']=roomName;
 
+    if(false){
     // Use connect method to connect to the server
     client.connect(function(err) {
       assert.equal(null, err);
@@ -140,6 +141,7 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
       const db = client.db(dbName);
       insertObj(db, 'nafLogs', msg.msgData, function(){});
     });
+    }
 
   }
   else{
