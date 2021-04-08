@@ -234,13 +234,8 @@
 
         <!-- Templates -->
 
-        <!-- Player -->
-        <template id="player-template">
-          <a-entity></a-entity>
-        </template>
-
         <!-- Avatar -->
-        <template id="head-template">
+        <template id="avatar-template">
           <a-entity class="avatar" networked-audio-source>
             <a-sphere class="head"
               color="#ffffff"
@@ -290,16 +285,15 @@
 
       </a-assets>
 
-      <a-entity id="player">
-        <a-entity name="camera" camera>
-            <a-sphere class="head"
-              random-color
-              visible="false"
-            ></a-sphere>
-        </a-entity>
-
-        <a-entity id="hand-left" hand-controls="hand:left"></a-entity>
-        <a-entity id="hand-right" hand-controls="hand:right"></a-entity>
+      <a-entity id="player" name="camera"
+        camera
+        >
+        <a-sphere class="head"
+          visible="false"
+          random-color
+        ></a-sphere>
+        <a-entity id="hand-left" hand-controls="hand: left;"></a-entity>
+        <a-entity id="hand-right" hand-controls="hand: right"></a-entity>
       </a-entity>
 
       <!-- Sun-->
@@ -350,22 +344,15 @@
     <script>
       // Define custom schema for syncing avatar color, set by random-color
       NAF.schemas.add({
-        template: '#head-template',
+        template: '#avatar-template',
         components: [
           'position',
           'rotation',
           {
             selector: '.head',
-            component: 'material'
+            component: 'material',
+            property: 'color'
           }
-        ]
-      });
-
-      NAF.schemas.add({
-        template: '#player-template',
-        components: [
-          'position',
-          'rotation'
         ]
       });
       NAF.schemas.add({
