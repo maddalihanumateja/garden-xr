@@ -47,9 +47,9 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Start Express http server
-//const webServer = http.createServer(app);
+const webServer = http.createServer(app);
 // Start Express https server
-const webServer = https.createServer({key: key, cert: cert}, app);
+//const webServer = https.createServer({key: key, cert: cert}, app);
 
 // Start Socket.io so it attaches itself to Express server
 const socketServer = socketIo.listen(webServer, {"log level": 1});
