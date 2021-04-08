@@ -233,13 +233,9 @@
       <a-assets>
 
         <!-- Templates -->
-        <!-- Player -->
-        <template id="player-template">
-          <a-entity></a-entity>
-        </template>
 
         <!-- Avatar -->
-        <template id="head-template">
+        <template id="avatar-template">
           <a-entity class="avatar" networked-audio-source>
             <a-sphere class="head"
               color="#ffffff"
@@ -289,16 +285,20 @@
 
       </a-assets>
 
-      <a-entity id="player" networked="template:#player-template;attachTemplateToLocal:false;" spawn-in-circle="radius:3" wasd-controls>
-        <a-entity camera position="0 1.6 0" look-controls networked="template:#head-template;attachTemplateToLocal:false;">
-            <a-sphere class="head"
-              random-color
-              visible="false"
-            ></a-sphere>
-        </a-entity>
-
-        <a-entity id="hand-left" hand-controls="hand:left" networked="template:#hand-template;"></a-entity>
-        <a-entity id="hand-right" hand-controls="hand:right" networked="template:#hand-template;"></a-entity>
+      <a-entity id="player"
+        networked="template:#avatar-template;attachTemplateToLocal:false;"
+        camera
+        position="0 1.6 0"
+        spawn-in-circle="radius:3"
+        wasd-controls look-controls
+        >
+        <a-sphere class="head"
+          visible="false"
+          random-color
+        >
+          <a-entity id="hand-left" hand-controls="hand: left" networked="template:#hand-template;"></a-entity>
+          <a-entity id="hand-right" hand-controls="hand: right" networked="template:#hand-template;"></a-entity>
+        </a-sphere>
       </a-entity>
 
       <!-- Sun-->
@@ -346,22 +346,15 @@
     <script>
       // Define custom schema for syncing avatar color, set by random-color
       NAF.schemas.add({
-        template: '#head-template',
+        template: '#avatar-template',
         components: [
           'position',
           'rotation',
           {
             selector: '.head',
-            component: 'material'
+            component: 'material',
+            property: 'color'
           }
-        ]
-      });
-
-      NAF.schemas.add({
-        template: '#player-template',
-        components: [
-          'position',
-          'rotation'
         ]
       });
       NAF.schemas.add({
