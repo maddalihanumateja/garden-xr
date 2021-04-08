@@ -330,11 +330,11 @@
       if (isMobile || isOculus) {
         //Add hands if oculus
       }
-      if(!isOculus){
-        var myobj = document.getElementById("hand-left");
-        myobj.remove();
-        var myobj = document.getElementById("hand-right");
-        myobj.remove();
+      if(!isOculus && ! isMobile){
+        //var myobj = document.getElementById("hand-left");
+        //myobj.remove();
+        //var myobj = document.getElementById("hand-right");
+        //myobj.remove();
       }
       else{
         //var myobj = document.getElementById("slidercontainer");
