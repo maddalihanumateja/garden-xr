@@ -204,7 +204,7 @@
   </head>
   <body>
     
-
+<div style="position:relative;">
     <a-scene networked-scene="
       app: gardenXR; 
       room: gardenXRsun;
@@ -264,11 +264,8 @@
 
       </a-assets>
 
-      <a-entity id="player"
+      <a-entity id="player" name="camera"
         camera
-        position="0 1.6 0"
-        spawn-in-circle="radius:3"
-        wasd-controls look-controls
         >
         <a-sphere class="head"
           visible="false"
@@ -287,6 +284,10 @@
       <a-sphere position="0 6 0" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
 
     </a-scene>
+    <div id="viewcontainer" class="" style="position:absolute; top:0; right:10%; z-index:1000; background-color:white">
+  <button onclick="alternate_viewpoint()">Alternate viewpoint</button>
+</div>
+</div>
 
     <script>
       // On mobile remove elements that are resource heavy
@@ -331,4 +332,47 @@
       }
     </script>
   </body>
+
+    <script type="text/javascript">
+      function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+      }
+      function alternate_viewpoint(){
+        var cam = document.getElementById("player");
+        cam.object3D.position.set(getRandomInt(-4,4),10,getRandomInt(-4,4));
+      }
+
+
+      
+      document.addEventListener('connected_entities_changed', function(e){
+        var viewcontainer = document.getElementById("viewcontainer");
+        viewcontainer.innerHTML = '';
+        for (var i=0; i<Object.keys(NAF.connection.entities.entities).length;i++){
+          var btn = document.createElement("BUTTON");   // Create a <button> element
+          btn.innerHTML = Object.keys(NAF.connection.entities.entities)[i];                   // Insert text
+          //console.log(NAF.connection.entities.entities[btn.innerHTML]);
+          btn.addEventListener('click', function(){
+            var cam = document.getElementsByName("camera")[0];
+            var remoteEntity = NAF.connection.entities.entities[btn.innerHTML];
+            remoteEntity.setAttribute('visible', false);
+            if(cam.getAttribute("id")=="player"){
+            }
+            else{
+              cam.setAttribute('visible', true);
+            }
+
+            cam.removeAttribute("camera");
+            remoteEntity.setAttribute("camera","");
+            remoteEntity.setAttribute("name","camera");
+            //cam.object3D.position.set(remoteEntity.object3D.position.x,remoteEntity.object3D.position.y,remoteEntity.object3D.position.z);
+
+          });
+          viewcontainer.appendChild(btn);               // Append <button> to <body>
+
+        }
+
+      });
+    </script>
 </html>
