@@ -3,6 +3,8 @@
 const fs = require('fs');
 const key = fs.readFileSync('./server/key.pem');
 const cert = fs.readFileSync('./server/cert.pem');
+
+usetextlog = false;
 const logFolderPath = './logs/';
 var currentRoomLogs = {};
 var currentUserRoom = {};
@@ -14,6 +16,7 @@ const express = require("express");           // web framework external module
 const socketIo = require("socket.io");        // web socket external module
 const easyrtc = require("open-easyrtc");      // EasyRTC external module
 
+const usemongo = true;
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
@@ -120,6 +123,7 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
     msg.msgData['serverTime']=Date.now();
     var roomName = currentUserRoom[connectionObj.getEasyrtcid()];
 
+    if(usetextlog){
     //Write logs to local file
     //console.log("["+connectionObj.getEasyrtcid()+"] :", JSON.stringify(msg.msgData));
     fs.appendFile(logFolderPath+currentRoomLogs[roomName],JSON.stringify(msg.msgData)+'\n', (err) => {
@@ -130,10 +134,10 @@ easyrtc.events.on("easyrtcMsg", (connectionObj, msg, socketCallback, next) => {
         //console.log("Wrote to "+ logFolderPath+currentRoomLogs[roomName]);
       }
     });
-
+  }
     msg.msgData['roomName']=roomName;
 
-    if(false){
+    if(usemongo){
     // Use connect method to connect to the server
     client.connect(function(err) {
       assert.equal(null, err);
