@@ -16,7 +16,7 @@ const express = require("express");           // web framework external module
 const socketIo = require("socket.io");        // web socket external module
 const easyrtc = require("open-easyrtc");      // EasyRTC external module
 
-const usemongo = true;
+const usemongo = false;
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
