@@ -348,8 +348,9 @@
       document.addEventListener('connected_entities_changed', function(e){
         var viewcontainer = document.getElementById("viewcontainer");
         viewcontainer.innerHTML = '';
+        var btn =[]
         for (var i=0; i<Object.keys(NAF.connection.entities.entities).length;i++){
-          var btn = document.createElement("BUTTON");   // Create a <button> element
+          btn[i] = document.createElement("BUTTON");   // Create a <button> element
           btn.innerHTML = Object.keys(NAF.connection.entities.entities)[i];                   // Insert text
           //console.log(NAF.connection.entities.entities[btn.innerHTML]);
           btn.addEventListener('click', function(){
@@ -368,7 +369,7 @@
             //cam.object3D.position.set(remoteEntity.object3D.position.x,remoteEntity.object3D.position.y,remoteEntity.object3D.position.z);
 
           });
-          viewcontainer.appendChild(btn);               // Append <button> to <body>
+          viewcontainer.appendChild(btn[i]);               // Append <button> to <body>
 
         }
 
