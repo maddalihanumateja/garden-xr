@@ -394,9 +394,9 @@
               cam.setAttribute('visible', true);
             }
 
-            cam.removeAttribute("camera");
-            cam.removeAttribute("name");
-            remoteEntity.setAttribute("camera","");
+            cam.setAttribute("camera",{'active':false});
+            cam.setAttribute("name","");
+            remoteEntity.setAttribute("camera",{'active':true});
             remoteEntity.setAttribute("name","camera");
             //cam.object3D.position.set(remoteEntity.object3D.position.x,remoteEntity.object3D.position.y,remoteEntity.object3D.position.z);
 
