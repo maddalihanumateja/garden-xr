@@ -356,12 +356,12 @@
           btn[i].addEventListener('click', function(){
             var cam = document.getElementsByName("camera")[0];
             var remoteEntity = NAF.connection.entities.entities[this.innerHTML];
-            remoteEntity.setAttribute('visible', false);
+            /*remoteEntity.setAttribute('visible', false);
             if(cam.getAttribute("id")=="player"){
             }
             else{
               cam.setAttribute('visible', true);
-            }
+            }*/
 
             cam.removeAttribute("camera");
             remoteEntity.setAttribute("camera","");
