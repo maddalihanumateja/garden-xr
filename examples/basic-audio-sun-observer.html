@@ -387,14 +387,15 @@
           btn[i].addEventListener('click', function(){
             var cam = document.getElementsByName("camera")[0];
             var remoteEntity = NAF.connection.entities.entities[this.innerHTML];
-            /*remoteEntity.setAttribute('visible', false);
+            remoteEntity.setAttribute('visible', false);
             if(cam.getAttribute("id")=="player"){
             }
             else{
               cam.setAttribute('visible', true);
-            }*/
+            }
 
             cam.removeAttribute("camera");
+            cam.removeAttribute("name");
             remoteEntity.setAttribute("camera","");
             remoteEntity.setAttribute("name","camera");
             //cam.object3D.position.set(remoteEntity.object3D.position.x,remoteEntity.object3D.position.y,remoteEntity.object3D.position.z);
