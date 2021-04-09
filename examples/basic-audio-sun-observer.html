@@ -382,11 +382,11 @@
         var btn =[]
         for (var i=0; i<Object.keys(NAF.connection.entities.entities).length;i++){
           btn[i] = document.createElement("BUTTON");   // Create a <button> element
-          btn.innerHTML = Object.keys(NAF.connection.entities.entities)[i];                   // Insert text
-          //console.log(NAF.connection.entities.entities[btn.innerHTML]);
-          btn.addEventListener('click', function(){
+          btn[i].innerHTML = Object.keys(NAF.connection.entities.entities)[i];                   // Insert text
+          //console.log(NAF.connection.entities.entities[btn[i].innerHTML]);
+          btn[i].addEventListener('click', function(){
             var cam = document.getElementsByName("camera")[0];
-            var remoteEntity = NAF.connection.entities.entities[btn.innerHTML];
+            var remoteEntity = NAF.connection.entities.entities[btn[i].innerHTML];
             remoteEntity.setAttribute('visible', false);
             if(cam.getAttribute("id")=="player"){
             }
