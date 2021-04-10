@@ -150,7 +150,7 @@
           particle_opacity:{type: 'number', default: 0.65}, 
           particle_metalness:{type: 'number', default: 0.0},
           particle_roughness:{type: 'number', default: 1.0},
-          particle_radius: {type: 'number', default: 0.02},
+          particle_radius: {type: 'number', default: 0.01},
           particle_color: {default: "#9CE3F9"},
           particle_mass: {type: 'number', default: 1},
           emission_interval: {type: 'int', default: 300},
@@ -259,7 +259,7 @@
         </template>
 
         <!-- /Templates -->
-        <a-asset-item id="garden" src="assets/garden_939faces_extruded.gltf"></a-asset-item>
+        <a-asset-item id="garden" src="assets/garden_1_2_10000f_8192t_lowdp.gltf"></a-asset-item>
 
       </a-assets>
 
@@ -279,7 +279,7 @@
         <a-entity light="color: #ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
 
       
-      <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -5 0" src="#garden" ground-properties></a-gltf-model>
+      <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -1 0" rotation="0 0 0" src="#garden" ground-properties></a-gltf-model>
       <a-sphere position="0 6 0" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
 
     </a-scene>
