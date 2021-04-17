@@ -46,7 +46,7 @@
               ground.setAttribute("ammo-body", {type: "static", mass: 100 });
               ground.setAttribute("ammo-shape", {type: "mesh" });
 
-              var rain_seed =document.getElementById('ground');
+              var rain_seed =document.getElementById('rain-seed');
               rain_seed.setAttribute("particles", "");
             },100);
             
@@ -146,7 +146,7 @@
 
       AFRAME.registerComponent('particles',{
         schema:{
-          particle_count: {type: 'int', default: 25},
+          particle_count: {type: 'int', default: 50},
           particle_opacity:{type: 'number', default: 0.65}, 
           particle_metalness:{type: 'number', default: 0.0},
           particle_roughness:{type: 'number', default: 1.0},
@@ -155,7 +155,7 @@
           particle_mass: {type: 'number', default: 1},
           emission_interval: {type: 'int', default: 300},
           deletion_interval: {type: 'int', default: 3000},
-          emission_radius: {type: 'int', default: 3}
+          emission_radius: {type: 'int', default: 5}
         },
         init:function(){
           this.tick = AFRAME.utils.throttleTick(this.tick, this.data.emission_interval, this);
@@ -207,7 +207,7 @@
 
     <a-scene networked-scene="
       app: gardenXR; 
-      room: gardenXRsun;
+      room: gardenXRrain;
       debug: true;
       adapter: easyrtc;
       audio: false;
@@ -259,15 +259,15 @@
         </template>
 
         <!-- /Templates -->
-        <a-asset-item id="garden" src="assets/garden_1_2_10000f_8192t_lowdp.gltf"></a-asset-item>
+        <a-asset-item id="garden" src="assets/s2_1_final.glb"></a-asset-item>
 
       </a-assets>
 
       <a-entity id="player"
         networked="template:#avatar-template;attachTemplateToLocal:false;"
         camera
-        position="0 1.6 0"
-        spawn-in-circle="radius:1"
+        position="2 1.6 -4"
+        spawn-in-circle="radius:2"
         wasd-controls look-controls
         >
         <a-sphere class="head"
@@ -284,7 +284,7 @@
 
       
       <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -1 0" rotation="0 0 0" src="#garden" ground-properties></a-gltf-model>
-      <a-sphere position="0 6 0" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
+      <a-sphere position="2 4 -4" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
 
     </a-scene>
 

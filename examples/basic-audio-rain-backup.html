@@ -1,0 +1,334 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>XR Garden - Rain</title>
+    <meta name="description" content="Remote Gardening Design Probe — Rain">
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://mixedreality.mozilla.org/ammo.js/builds/ammo.wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+
+     <script>
+    // See also https://github.com/aframevr/aframe/pull/4356
+          AFRAME.registerComponent('hide-in-ar-mode', {
+            // Set this object invisible while in AR mode.
+            init: function () {
+              this.el.sceneEl.addEventListener('enter-vr', (ev) => {
+                this.wasVisible = this.el.getAttribute('visible');
+                if (this.el.sceneEl.is('ar-mode')) {
+                  this.el.setAttribute('visible', false);
+                }
+              });
+              this.el.sceneEl.addEventListener('exit-vr', (ev) => {
+                if (this.wasVisible) this.el.setAttribute('visible', true);
+              });
+            }
+          });
+    </script>
+    <script>
+      AFRAME.registerComponent("ground-properties", {
+        schema:{},
+        init: function(){      
+          this.el.addEventListener("body-loaded", function(e) {
+            var ground = document.getElementById('ground');
+            ground.body.setRestitution(0);
+
+          });
+          this.el.addEventListener("model-loaded", function(e){
+            console.log("model-loaded");
+            setTimeout(function(){
+              var ground = document.getElementById('ground');
+              ground.setAttribute("ammo-body", {type: "static", mass: 100 });
+              ground.setAttribute("ammo-shape", {type: "mesh" });
+
+              var rain_seed =document.getElementById('rain-seed');
+              rain_seed.setAttribute("particles", "");
+            },100);
+            
+          });
+          //ammo-body="type: static; mass: 100;" ammo-shape="type: box ;"
+        }
+      });
+
+      AFRAME.registerComponent('apply-wind', {
+        schema: {
+            x: { type: "number", default: 0.01 },
+            y: { type: "number", default: 0.0 },
+            z: { type: "number", default: 0.01 },
+            std: { type: "number", default: 0.05 }
+          },
+          init: function() {
+            this.el.body.setRestitution(0);
+            const force = new Ammo.btVector3(this.data.x * (1 - Math.random() * this.data.std), this.data.y * (1 - Math.random() * this.data.std), this.data.z * (1 - Math.random() * this.data.std));
+            const pos = new Ammo.btVector3(this.el.object3D.position.x, this.el.object3D.position.y, this.el.object3D.position.z);
+            this.el.body.applyForce(force, pos);
+            Ammo.destroy(force);
+            Ammo.destroy(pos);
+          },
+        tick:function(){
+          if(this.el.object3D.position.y<this.data.ground_level){
+            var visible_line_trail = document.getElementById("visible_line_trail"+this.el.id);
+          //If trail component was added
+          if(visible_line_trail){
+            visible_line_trail.parentElement.removeChild(visible_line_trail);
+          }
+            this.el.parentElement.removeChild(this.el);
+          }
+        }
+      });
+
+
+
+      AFRAME.registerComponent('position-trail', {
+        schema: {
+          position_buffer: {type:'array', default:[]},
+          trail_length: {type: 'int', default: 4},
+          trail_width: {type: 'number', default: 0.05},
+          trail_opacity: {type: 'number', default: 0.95},
+          trail_color: {default: "#9CE3F9"}
+        },
+        init: function () {
+          for(var i=0;i<this.data.trail_length;i++){
+            this.data.position_buffer[i] = new THREE.Vector3().copy(this.el.object3D.position); 
+          }
+          
+          var visible_line_trail = document.createElement('a-entity');
+          visible_line_trail.setAttribute('id',"visible_line_trail"+this.el.id);
+          document.getElementsByTagName("a-scene")[0].appendChild(visible_line_trail);
+          //this.tick = AFRAME.utils.throttleTick(this.tick, 20, this);
+        },
+        tick: function (time, timeDelta) {
+          var visible_line_trail = document.getElementById("visible_line_trail"+this.el.id);
+          for(var i=(this.data.trail_length-1);i>0;i--){
+            this.data.position_buffer[i] = new THREE.Vector3().copy(this.data.position_buffer[i-1]);
+          }
+          this.data.position_buffer[0] = new THREE.Vector3().copy(this.el.object3D.position);
+
+
+          for(var i=0;i<this.data.trail_length-1;i++){
+            var line_string = 'line__'+(i+1);
+            if(i==0){
+              line_string = 'line'
+            }
+            visible_line_trail.setAttribute(line_string, {
+              start: AFRAME.utils.coordinates.stringify(this.data.position_buffer[i+1]),
+              end: AFRAME.utils.coordinates.stringify(this.data.position_buffer[i]),
+              opacity: this.data.trail_opacity,
+              color: this.data.trail_color
+            }); 
+          }
+        },
+        remove: function () {},
+        pause: function () {},
+        play: function () {}
+      });
+
+      AFRAME.registerComponent('remove-below-ground', {
+        schema:{
+          ground_level:{type: 'number', default: -7.0} 
+        },
+        tick:function(){
+          if(this.el.object3D.position.y<this.data.ground_level){
+            var visible_line_trail = document.getElementById("visible_line_trail"+this.el.id);
+          //If trail component was added
+          if(visible_line_trail){
+            visible_line_trail.parentElement.removeChild(visible_line_trail);
+          }
+            this.el.parentElement.removeChild(this.el);
+          }
+        }
+      });
+
+      AFRAME.registerComponent('particles',{
+        schema:{
+          particle_count: {type: 'int', default: 50},
+          particle_opacity:{type: 'number', default: 0.65}, 
+          particle_metalness:{type: 'number', default: 0.0},
+          particle_roughness:{type: 'number', default: 1.0},
+          particle_radius: {type: 'number', default: 0.01},
+          particle_color: {default: "#9CE3F9"},
+          particle_mass: {type: 'number', default: 1},
+          emission_interval: {type: 'int', default: 300},
+          deletion_interval: {type: 'int', default: 3000},
+          emission_radius: {type: 'int', default: 4}
+        },
+        init:function(){
+          this.tick = AFRAME.utils.throttleTick(this.tick, this.data.emission_interval, this);
+        },
+        createParticle: function(rand_position){
+          var particle = document.createElement('a-sphere');
+          particle.object3D.position.copy(rand_position);
+          particle.setAttribute('radius',this.data.particle_radius);
+          particle.setAttribute('position-trail',"");
+          particle.setAttribute('material',{
+            color: this.data.particle_color, 
+            opacity: this.data.particle_opacity,
+            metalness: this.data.particle_metalness,
+            roughness: this.data.particle_roughness
+          });
+          particle.setAttribute("ammo-body", {mass: this.data.particle_mass });
+          particle.setAttribute("ammo-shape", {type: "sphere" });
+          particle.setAttribute('apply-wind',"");
+          particle.setAttribute('remove-below-ground',"");
+          particle.setAttribute('id', "_particle"+Date.now());
+          document.getElementsByTagName("a-scene")[0].appendChild(particle);
+          setTimeout(this.deleteParticle,this.data.deletion_interval,particle.id);
+        },
+        tick: function(time, timeDelta){
+
+            var rand_angle = Array.from(Array(this.data.particle_count)).map(x=>Math.random()*Math.PI*2);
+            var rand_positions = rand_angle.map(x=> new THREE.Vector3(this.el.object3D.position.x + Math.cos(x)*Math.random()*this.data.emission_radius, this.el.object3D.position.y + (2*Math.random()-1)*this.data.emission_radius, this.el.object3D.position.z + Math.sin(x)*Math.random()*this.data.emission_radius));
+            rand_positions.forEach(x=>this.createParticle(x));
+        },
+        deleteParticle: function(particle_id){
+          var visible_line_trail = document.getElementById("visible_line_trail"+particle_id);
+          var particle = document.getElementById(particle_id);
+          //If trail component was added
+          if(visible_line_trail){
+            visible_line_trail.parentElement.removeChild(visible_line_trail);
+          }
+          if(particle){
+            particle.parentElement.removeChild(particle);
+          }
+          
+        }
+      });
+
+    </script>
+
+  </head>
+  <body>
+    
+
+    <a-scene networked-scene="
+      app: gardenXR; 
+      room: gardenXRrainBackup;
+      debug: true;
+      adapter: easyrtc;
+      audio: false;
+    " background="color:#878d8b"
+    webxr physics=" driver: ammo; iterations:6; debug:false">
+      <a-assets>
+
+        <!-- Templates -->
+
+        <!-- Avatar -->
+        <template id="avatar-template">
+          <a-entity class="avatar" networked-audio-source>
+            <a-sphere class="head"
+              color="#ffffff"
+              scale="0.45 0.5 0.4"
+            ></a-sphere>
+            <a-entity class="face"
+              position="0 0.05 0"
+            >
+              <a-sphere class="eye"
+                color="#efefef"
+                position="0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+              <a-sphere class="eye"
+                color="#efefef"
+                position="-0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+            </a-entity>
+          </a-entity>
+        </template>
+        <!-- Hand -->
+        <template id="hand-template">
+          <a-entity>
+          </a-entity>
+        </template>
+
+        <!-- /Templates -->
+        <a-asset-item id="garden" src="assets/s2_2_final.glb"></a-asset-item>
+
+      </a-assets>
+
+      <a-entity id="player"
+        networked="template:#avatar-template;attachTemplateToLocal:false;"
+        camera
+        position="0 1.6 0"
+        spawn-in-circle="radius:2"
+        wasd-controls look-controls
+        >
+        <a-sphere class="head"
+          visible="false"
+          random-color
+        ></a-sphere>
+        <a-entity id="hand-left" hand-controls="hand: left" networked="template:#hand-template;"></a-entity>
+        <a-entity id="hand-right" hand-controls="hand: right" networked="template:#hand-template;"></a-entity>
+      </a-entity>
+        
+      <!--Ambient Lighting-->
+        <a-entity light="color: #ccccff; intensity: 1; type: ambient;" visible=""></a-entity>
+        <a-entity light="color: #ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
+
+      
+      <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -1 1.5" rotation="0 0 0" src="#garden" ground-properties></a-gltf-model>
+      <a-sphere position="0 4 0" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
+
+    </a-scene>
+
+    <script>
+      // On mobile remove elements that are resource heavy
+      
+      var isOculus = AFRAME.utils.device.isMobileVR();
+      var isMobile = AFRAME.utils.device.isMobile();
+      if (isMobile || isOculus) {
+        //Add hands if oculus
+      }
+      if(!isOculus){
+        var myobj = document.getElementById("hand-left");
+        myobj.remove();
+        var myobj = document.getElementById("hand-right");
+        myobj.remove();
+      }
+      else{
+        //var myobj = document.getElementById("slidercontainer");
+        //myobj.remove();
+      }
+
+
+    </script>
+
+    <script>
+      // Define custom schema for syncing avatar color, set by random-color
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+          {
+            selector: '.head',
+            component: 'material',
+            property: 'color'
+          }
+        ]
+      });
+
+      // Called by Networked-Aframe when connected to server
+      function onConnect () {
+        console.log("onConnect", new Date());
+      }
+    </script>
+  </body>
+</html>

@@ -281,15 +281,15 @@
              geometry="primitive: sphere; radius: 1.0"
              material="color: #FFF; shader: flat"
              light="type: directional; castShadow: true; intensity: 2.5;"></a-mixin>
-        <a-asset-item id="garden" src="assets/garden_1_10000f_8192t.gltf"></a-asset-item>
+        <a-asset-item id="garden" src="assets/s2_1_final.glb"></a-asset-item>
 
       </a-assets>
 
       <a-entity id="player"
         networked="template:#avatar-template;attachTemplateToLocal:false;"
         camera
-        position="0 1.6 0"
-        spawn-in-circle="radius:1"
+        position="2 1.6 -4"
+        spawn-in-circle="radius:2"
         wasd-controls look-controls
         >
         <a-sphere class="head"
