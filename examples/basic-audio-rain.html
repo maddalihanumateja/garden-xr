@@ -87,7 +87,7 @@
       AFRAME.registerComponent('position-trail', {
         schema: {
           position_buffer: {type:'array', default:[]},
-          trail_length: {type: 'int', default: 4},
+          trail_length: {type: 'int', default: 3},
           trail_width: {type: 'number', default: 0.05},
           trail_opacity: {type: 'number', default: 0.95},
           trail_color: {default: "#9CE3F9"}
@@ -146,7 +146,7 @@
 
       AFRAME.registerComponent('particles',{
         schema:{
-          particle_count: {type: 'int', default: 50},
+          particle_count: {type: 'int', default: 25},
           particle_opacity:{type: 'number', default: 0.65}, 
           particle_metalness:{type: 'number', default: 0.0},
           particle_roughness:{type: 'number', default: 1.0},
