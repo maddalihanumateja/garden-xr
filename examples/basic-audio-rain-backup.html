@@ -87,7 +87,7 @@
       AFRAME.registerComponent('position-trail', {
         schema: {
           position_buffer: {type:'array', default:[]},
-          trail_length: {type: 'int', default: 4},
+          trail_length: {type: 'int', default: 3},
           trail_width: {type: 'number', default: 0.05},
           trail_opacity: {type: 'number', default: 0.95},
           trail_color: {default: "#9CE3F9"}
@@ -146,7 +146,7 @@
 
       AFRAME.registerComponent('particles',{
         schema:{
-          particle_count: {type: 'int', default: 50},
+          particle_count: {type: 'int', default: 25},
           particle_opacity:{type: 'number', default: 0.65}, 
           particle_metalness:{type: 'number', default: 0.0},
           particle_roughness:{type: 'number', default: 1.0},
@@ -259,7 +259,7 @@
         </template>
 
         <!-- /Templates -->
-        <a-asset-item id="garden" src="assets/s2_2_final.glb"></a-asset-item>
+        <a-asset-item id="garden" src="assets/s1_2_final.glb"></a-asset-item>
 
       </a-assets>
 
@@ -283,7 +283,7 @@
         <a-entity light="color: #ffaaff; intensity: 1.5" position="5 5 5"></a-entity>
 
       
-      <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 -1 0" rotation="0 0 0" src="#garden" ground-properties></a-gltf-model>
+      <a-gltf-model id="ground" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0" src="#garden" ground-properties></a-gltf-model>
       <a-sphere position="0 4 1" color="#878d8b" radius="0.01" id="rain-seed"></a-sphere>
 
     </a-scene>
