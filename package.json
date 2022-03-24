@@ -1,6 +1,6 @@
 {
   "name": "garden-xr",
-  "version": "0.8.0",
+  "version": "0.8.3",
   "description": "Remote Gardening Design probes built using Hayden Lee's networked A-Frame module",
   "homepage": "",
   "main": "src/index.js",
