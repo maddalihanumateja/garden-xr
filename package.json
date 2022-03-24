@@ -7,7 +7,7 @@
   "author": "Teja Maddali <hmaddali@umd.edu>",
   "license": "MIT",
   "scripts": {
-    "build": "npm run dist && shx cp -r dist examples",
+    "build": "node ./server/easyrtc-server.js",
     "dev": "cross-env NODE_ENV=development node ./server/easyrtc-server.js",
     "dev-socketio": "cross-env NODE_ENV=development node ./server/socketio-server.js",
     "dist": "npm run dist:min && npm run dist:max",
