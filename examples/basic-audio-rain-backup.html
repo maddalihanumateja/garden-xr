@@ -393,11 +393,11 @@
 
       <a-entity id="camera-rig"
                 tracked-vr-hands
-                movement-controls="fly:false;"
+                wasd-controls look-controls
                 spawn-in-circle="radius:2"
                 networked="template:#camera-rig-template;"
       >
-        <a-entity id="local-avatar" camera position="0 1.6 0" look-controls
+        <a-entity id="local-avatar" camera position="0 1.6 0"
                   networked="template:#head-template;" visible="false">
         </a-entity>
       </a-entity>
