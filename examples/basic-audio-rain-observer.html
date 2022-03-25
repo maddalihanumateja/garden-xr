@@ -354,7 +354,7 @@
         <!--      a few spheres make a head + eyes + pupils    -->
         <template id="head-template">
           <a-entity class="avatar" player-info>
-            <a-sphere class="head" scale="0.2 0.22 0.2" ></a-sphere>
+            <a-sphere class="head" scale="0.3 0.33 0.3" ></a-sphere>
             <a-entity class="face"
               position="0 0.05 0"
             >
@@ -392,11 +392,11 @@
 
       </a-assets>
 
-      <a-entity id="camera-rig"
+      <a-entity id="camera-rig" 
                 networked="template:#camera-rig-template;"
                 visible="false"
       >
-        <a-entity id="local-avatar" camera position="0 1.6 0"
+        <a-entity id="local-avatar" name="camera" camera position="0 1.6 0"
                   networked="template:#head-template;" visible="false">
         </a-entity>
       </a-entity>
