@@ -7,8 +7,7 @@ For the demonstration scenarios, we refer to two examples in the expert-novice d
  - Example Scenario 1: Gauging the slope to visualize the flow of water. In this example, gardeners can simulate rain, and discuss how the flow of water across a 3D mode of the plot might affect certain tasks.
  - Example Scenario 2: Visualizing the distribution of shade. This is a temporal process. The gardeners can observe how “moving” the sun across the sky on a virtual model of the garden can affect the distribution of sunlight and discuss how that might affect certain tasks. 
 
-<iframe src="https://drive.google.com/file/d/1GfcGL352TUSt7rROPXuPh3TJ3L5Ww_4c/preview" width="640" height="480" allow="autoplay"></iframe>
-<iframe src="https://drive.google.com/file/d/14vN8kC79zEHVTW7Eb_dn5omzD7evdjA7/preview" width="640" height="480" allow="autoplay"></iframe>
+![Example Scenario 1: Rain simulated on the garden model](https://drive.google.com/uc?id=1GfcGL352TUSt7rROPXuPh3TJ3L5Ww_4c) ![Example Scenario 2: Virtual sun moving across the garden model](https://drive.google.com/uc?id=14vN8kC79zEHVTW7Eb_dn5omzD7evdjA7)
 
 
 Getting Started
